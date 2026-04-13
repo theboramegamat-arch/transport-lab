@@ -1085,15 +1085,7 @@ function showPage(id){
   if(id==='landing'){document.getElementById('landing').style.display='flex';}
   else{document.getElementById(id).className='page active';}
 }
-function goHome(){
-  // נקה את מצב התלמיד הנוכחי לגמרי
-  state.name='';
-  state.cls='';
-  // נקה את רשימת הדוחות מיד כדי שהתלמיד הבא לא יראה
-  const list=document.getElementById('reportsList');
-  if(list) list.innerHTML='';
-  showPage('landing');
-}
+function goHome(){showPage('landing');}
 
 // ============================================================
 // OVERLAYS
@@ -1134,13 +1126,6 @@ function loginStep2(){
   const cls=document.getElementById('loginClass').value;
   if(!cls){toast('❗ בחר כיתה','error');return;}
   state.cls=cls;
-  // איפוס שדות השם בכל פעם שבוחרים כיתה
-  const lf=document.getElementById('loginFirst');
-  const ll=document.getElementById('loginLast');
-  if(lf)lf.value='';
-  if(ll)ll.value='';
-  // וודא שה-step2 מוצג כרגיל (ולא מסך אישור ישן)
-  resetLoginStep2();
   updateLoginSteps(2);
 }
 // ---- Fuzzy matching helpers ----
@@ -1298,21 +1283,9 @@ function checkStudentPin(){
 // ============================================================
 function openStudentPage(){
   document.getElementById('studentNameDisplay').textContent=state.name;
-  document.getElementById('studentClassDisplay').textContent='כיתה '+state.cls+'\' — מגמת תחבורה';
+  document.getElementById('studentClassDisplay').textContent='כיתה '+state.cls+'\'  — מגמת תחבורה';
+  renderReports();
   showPage('studentPage');
-
-  // ניקוי מיידי - לא לראות דוחות של תלמיד קודם
-  const list=document.getElementById('reportsList');
-  list.innerHTML=`
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:20px;">
-      <div style="width:52px;height:52px;border:4px solid var(--border);border-top:4px solid var(--accent);border-radius:50%;animation:rotate 0.9s linear infinite;"></div>
-      <div style="color:var(--muted);font-size:15px;font-weight:500;">טוען דוחות מ-Drive...</div>
-    </div>`;
-
-  const cls=state.cls, name=state.name;
-  autoScanStudentFromDrive(cls, name, ()=>{
-    renderReports();
-  });
 }
 
 function renderReports(){
@@ -1519,9 +1492,14 @@ function deleteTopicStudent(topicId){
 }
 function downloadFile(topicId){
   const r=getReport(state.cls,state.name,topicId);
-  if(!r.fileData){toast('❗ אין קובץ להורדה','error');return;}
-  const a=document.createElement('a');
-  a.href=r.fileData;a.download=r.filename;a.click();
+  if(r.fileData){
+    const a=document.createElement('a');
+    a.href=r.fileData;a.download=r.filename;a.click();
+  } else if(r.fileUrl){
+    window.open(r.fileUrl,'_blank');
+  } else {
+    toast('❗ אין קובץ להורדה','error');
+  }
 }
 
 // ============================================================
