@@ -963,7 +963,7 @@ function autoScanStudentFromDrive(cls, name, callback){
 // GOOGLE DRIVE CONFIG
 // ============================================================
 const DRIVE_KEY='transport_drive_url';
-const PRESET_DRIVE_URL='https://script.google.com/macros/s/AKfycbyWPUvMSZ6Tmc2ak9Z3znUAB95jTDhqmFSJgNBafSGxyDoJYIe_8xspQo0KlGemnV_17A/exec';
+const PRESET_DRIVE_URL='https://script.google.com/macros/s/AKfycbw4RZkZ0yhT4qr3MpATGEHbCBWQNEFc30row7gN-jMuje_j6TG-h1xhX3QJIV5sXR3hxA/exec';
 function getDriveUrl(){return localStorage.getItem(DRIVE_KEY)||PRESET_DRIVE_URL;}
 function setDriveUrl(url){localStorage.setItem(DRIVE_KEY,url);}
 function hasDrive(){return true;} // always connected via preset URL
@@ -1492,14 +1492,9 @@ function deleteTopicStudent(topicId){
 }
 function downloadFile(topicId){
   const r=getReport(state.cls,state.name,topicId);
-  if(r.fileData){
-    const a=document.createElement('a');
-    a.href=r.fileData;a.download=r.filename;a.click();
-  } else if(r.fileUrl){
-    window.open(r.fileUrl,'_blank');
-  } else {
-    toast('❗ אין קובץ להורדה','error');
-  }
+  if(!r.fileData){toast('❗ אין קובץ להורדה','error');return;}
+  const a=document.createElement('a');
+  a.href=r.fileData;a.download=r.filename;a.click();
 }
 
 // ============================================================
